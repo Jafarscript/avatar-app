@@ -1,5 +1,5 @@
-import express from express;
-import bcrypt from bcrypt;
+import express from "express";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../model/User.js";
 
@@ -7,7 +7,7 @@ import User from "../model/User.js";
 const router = express.Router();
 
 router.post("/register", async(req, res) => {
-    const {userName, email, password, displayName} = req.body;
+    const {userName, email, password, displayName, bio, avatar} = req.body;
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -15,12 +15,50 @@ router.post("/register", async(req, res) => {
         const user = await User.create({
             userName,
             email,
-            password,
-            displayName
+            password: hashedPassword,
+            displayName,
+            bio,
+            avatar
         })
         res.status(201).json(user);
     } catch (error) {
         res.status(400).json({ error: error.message });
+    }
+})
+
+router.post("/login", async (req, res) => {
+    try {
+    const {identifier, password } = req.body;
+
+    if (!identifier || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const user = await User.findOne({
+        $or: [
+            {email: identifer},
+            {userName : identifer}
+        ]
+    });
+
+    if (!user) return res.status(400).json({message: "Wrong Email or Username"});
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) return res.status(400).json({message: "Wrong email/username or password"});
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: { id: user._id, name: user.userName, email: user.email },
+    });
+    
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 })
 
