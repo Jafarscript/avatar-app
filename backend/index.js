@@ -16,7 +16,9 @@ app.get("/", (req, res) => {
     res.send("<h1>Hello User</h1>")
 })
 
-app.use("/auth", authRoutes)
+app.use("/auth", authRoutes);
+
+app.use("/uploads", express.static("uploads"));
 
 
 mongoose.connect(process.env.MONGODB_URL)
