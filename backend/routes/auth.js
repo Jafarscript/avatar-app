@@ -39,8 +39,8 @@ router.post("/login", async (req, res) => {
 
     const user = await User.findOne({
         $or: [
-            {email: identifer},
-            {userName : identifer}
+            {email: identifier},
+            {userName : identifier}
         ]
     });
 

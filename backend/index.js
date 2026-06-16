@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
-import authRoutes from "./routes/auth.js"
+import authRoutes from "./routes/auth.js";
+import profileRoutes from "./routes/profile.js"
 
 dotenv.config()
 const app = express();
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/auth", authRoutes);
+app.use("/profile", profileRoutes)
 
 app.use("/uploads", express.static("uploads"));
 
