@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 router.post("/register", async(req, res) => {
-    const {userName, email, password, displayName, bio, avatar} = req.body;
+    const {userName, email, password, displayName} = req.body;
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,12 +19,14 @@ router.post("/register", async(req, res) => {
             userName,
             email,
             password: hashedPassword,
-            displayName,
-            bio,
-            avatar
+            displayName
         })
         res.status(201).json(user);
     } catch (error) {
+        if (error.code === 11000) {
+        const field = Object.keys(error.keyValue)[0]
+        return res.status(400).json({ error: `${field} is already taken` })
+    }
         res.status(400).json({ error: error.message });
     }
 })
